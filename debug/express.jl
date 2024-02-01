@@ -45,39 +45,16 @@ hallway = [80.0 80.0;
 rewarddist = abs.(rewarddist)
 mapsize = reverse(size(rewarddist)) #(13,16)
 maxbatt = 1000
-sinit = FullState([3,1], [10,11], vec(trues(mapsize)), maxbatt)#rand(initialstate(msim))
-#mapsize = (13,16)
-#sinit = TSState([10,1],[13,16],trues(prod(mapsize)))#rand(initialstate(msim))
-#mapsize = (4,4)
-#sinit = TSState([1,1],[4,4],trues(prod(mapsize)))#rand(initialstate(msim))
-sinitBasic = BasicState(sinit.robot,sinit.target)
+sinit = TSStateBattery([3,1], [10,11], maxbatt)#rand(initialstate(msim))
 
-
-#= pomdp = FullPOMDP(sinit, 
+pomdp = TSPOMDPBattery(sinit, 
                     size=mapsize, 
                     rewarddist=rewarddist, 
                     maxbatt=maxbatt)
- =#
-pomdp = create_target_search_pomdp(sinit, 
-                                    size=mapsize, 
-                                    rewarddist=rewarddist, 
-                                    maxbatt=maxbatt, options=Dict(:observation_model=>:falco))
 
-basic_pomdp = BasicPOMDP(sinitBasic, size=mapsize)
-mdp_solver = ValueIterationSolver() # creates the solver
-mdp_policy = solve(mdp_solver, UnderlyingMDP(basic_pomdp))
-
-p = FunctionPolicy(FixedPolicy())
-mdprollout = FORollout(TargetSearchMDPPolicy(mdp_policy))
-funcrollout = FORollout(p)
-#mdprollout = FORollout(mdp_policy) # change MDP reward mat to pompdp reward mat
-#solver = POMCPSolver(estimate_value = mdprollout, tree_queries=10000, max_time=0.2, c=5) # mdp policy rollout
-#solver = POMCPSolver(estimate_value = funcrollout, tree_queries=10000, max_time=0.2, c=5) # up rollout
-solver = POMCPSolver(tree_queries=10_000, max_time=0.2, c=5) # random
-
+solver = POMCPSolver(tree_queries=10_000, max_time=0.2, c=80) # random
 
 planner = solve(solver,pomdp)
-
 
 b0 = initialstate(pomdp)
 N = 1000
@@ -90,8 +67,5 @@ particle_b = initialize_belief(particle_up, b0)
 
 hipposim = HIPPOSimulator(msim=pomdp, planner=planner, up=particle_up, b=particle_b, sinit=sinit, dt=1/10, max_iter=maxbatt, display=true)
 hist, r_total = simulateHIPPO(hipposim)
-
-#renderVIPolicy(mdp_policy, basic_pomdp, sinitBasic) # render MDP policy
-
 
 println("Total Reward: ", r_total)

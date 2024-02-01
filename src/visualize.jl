@@ -1,5 +1,5 @@
 mutable struct GridWorldEnv
-    m::BasicPOMDP
+    m::TSPOMDPBattery
     size::SVector{2, Int}
     rewards::Matrix{Float64}
     robotInit::SVector{2, Int}
@@ -86,7 +86,7 @@ function rendhist(hist, m, rewarddist; delay=0.1)
     end
 end 
 
-function POMDPTools.ModelTools.render(m::TargetSearchPOMDP, goal, 
+function POMDPTools.ModelTools.render(m::TSPOMDPBattery, goal, 
                                             hippo::Vector{StaticArraysCore.SVector{2, Int64}}, 
                                             baseline::Vector{StaticArraysCore.SVector{2, Int64}})
     nx, ny = m.size

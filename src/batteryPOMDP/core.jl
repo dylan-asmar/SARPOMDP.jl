@@ -11,15 +11,14 @@ mutable struct TSPOMDPBattery <: POMDP{TSStateBattery, Symbol, BitArray{1}}
     tprob::Float64
     targetloc::SVector{2, Int}
     rois::Dict{Vector{Int64}, Float64}
-    belief::Matrix{Float64}
+    reward::Matrix{Float64}
     maxbatt::Int
-    #obsindices::Array{Union{Nothing,Int}, 4}
 end
 
 function TSPOMDPBattery(sinit::TSStateBattery; 
                         roi_points=Dict(), 
                         size=(10,10), 
-                        belief=Array{Float64}(undef, 0, 0), 
+                        rewarddist=Array{Float64}(undef, 0, 0), 
                         maxbatt=100)
 
     obstacles = Set{SVector{2, Int}}()
@@ -29,5 +28,5 @@ function TSPOMDPBattery(sinit::TSStateBattery;
     rois = roi_points
     maxbatt = maxbatt
   
-    TSPOMDPBattery(size, obstacles, robot_init, tprob, targetloc, rois, belief, maxbatt)
+    TSPOMDPBattery(size, obstacles, robot_init, tprob, targetloc, rois, rewarddist, maxbatt)
 end
