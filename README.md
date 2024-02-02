@@ -1,2 +1,2 @@
-# XPOMDP.jl
-Explainable POMDPs
+# SARPOMDP.jl
+Search and Rescue POMDP
