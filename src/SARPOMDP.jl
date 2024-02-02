@@ -1,4 +1,4 @@
-module HIPPO
+module SARPOMDP
 
 using POMDPs
 using POMDPTools
