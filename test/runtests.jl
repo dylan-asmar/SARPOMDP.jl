@@ -3,6 +3,7 @@ using POMDPs
 using POMDPTools
 using Test
 using StaticArrays
+using LinearAlgebra
 
 #New Tests
 # rewarddist = [-3.08638     1.04508  -38.9812     6.39193    7.2648     5.96755     9.32665   -9.62812   -0.114036    7.38693      3.39033   -5.17863  -12.7841;
@@ -44,7 +45,7 @@ pomdp = SAR_POMDP(sinit,
                     size=mapsize, 
                     rewarddist=rewarddist, 
                     maxbatt=maxbatt)
-
+# pomdp = SAR_POMDP()
 
 @testset "Indices" begin
     x = 0

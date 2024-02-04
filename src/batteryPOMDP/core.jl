@@ -10,13 +10,14 @@ mutable struct SAR_POMDP <: POMDP{SAR_State, Symbol, BitArray{1}}
     robot_init::SVector{2, Int}
     tprob::Float64
     targetloc::SVector{2, Int}
-    rois::Dict{Vector{Int64}, Float64}
+    r_locs::Vector{SVector{2,Int64}}
+    r_vals::Vector{Float64}
     reward::Matrix{Float64}
     maxbatt::Int
 end
 
 function SAR_POMDP(sinit::SAR_State; 
-                        roi_points=Dict(), 
+                        roi_points=Dict{SVector{2,Int64},Float64}(), 
                         size=(10,10), 
                         rewarddist=Array{Float64}(undef, 0, 0), 
                         maxbatt=100)
@@ -25,8 +26,33 @@ function SAR_POMDP(sinit::SAR_State;
     robot_init = sinit.robot
     tprob = 0.7
     targetloc = sinit.target
-    rois = roi_points
+    r_locs = keys(roi_points)
+    r_vals = values(roi_points)
     maxbatt = maxbatt
   
-    SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, rois, rewarddist, maxbatt)
+    return SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, SVector{2,Int64}[r_locs...], Float64[r_vals...], rewarddist, maxbatt)
+end
+
+function SAR_POMDP(;
+    init_ro = [1,1],
+    target = [4,4],
+    maxbatt = 20,
+    rew_locs = SVector{3}([[1,4],[4,1],[3,3]]),
+    rew_vals = SVector{3}([2.0,2.0,1.0]),
+    size=(5,5))
+
+
+    rewarddist = zeros(size)
+    for (i,l) in enumerate(rew_locs)
+        rewarddist[l...] = rew_vals[i]
+    end
+
+    sinit = SAR_State(init_ro,target,maxbatt)
+    obstacles = Set{SVector{2, Int}}()
+    robot_init = sinit.robot
+    tprob = 0.7
+    targetloc = sinit.target
+    maxbatt = maxbatt
+
+    return SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, rew_locs, rew_vals, rewarddist, maxbatt)
 end
