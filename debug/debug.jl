@@ -1,4 +1,4 @@
-using HIPPO
+using SARPOMDP
 using POMDPs
 using BasicPOMCP
 using POMDPTools
@@ -45,9 +45,9 @@ hallway = [80.0 80.0;
 rewarddist = abs.(rewarddist)
 mapsize = reverse(size(rewarddist)) #(13,16)
 maxbatt = 1000
-sinit = TSStateBattery([3,1], [10,11], maxbatt)#rand(initialstate(msim))
+sinit = SAR_State([3,1], [10,11], maxbatt)#rand(initialstate(msim))
 
-pomdp = TSPOMDPBattery(sinit, 
+pomdp = SAR_POMDP(sinit, 
                     size=mapsize, 
                     rewarddist=rewarddist, 
                     maxbatt=maxbatt)
@@ -65,7 +65,7 @@ particle_b = initialize_belief(particle_up, b0)
 #a, info = action_info(planner, Deterministic(FullState([13,4],mapsize,vec(trues(mapsize)), maxbatt)), tree_in_info=true)
 #inchrome(D3Tree(info[:tree], init_expand=3))
 
-hipposim = HIPPOSimulator(msim=pomdp, planner=planner, up=particle_up, b=particle_b, sinit=sinit, dt=1/10, max_iter=maxbatt, display=true)
-hist, r_total = simulateHIPPO(hipposim)
+sarsim = SARPOMDPSimulator(msim=pomdp, planner=planner, up=particle_up, b=particle_b, sinit=sinit, dt=1/10, max_iter=maxbatt, display=true)
+hist, r_total = simulateSARPOMDP(sarsim)
 
 println("Total Reward: ", r_total)

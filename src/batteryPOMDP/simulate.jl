@@ -1,9 +1,9 @@
-Base.@kwdef mutable struct HIPPOSimulator 
-    msim::TSPOMDPBattery
+Base.@kwdef mutable struct SARPOMDPSimulator 
+    msim::SAR_POMDP
     planner::POMCPPlanner
     up::BasicParticleFilter
     b::ParticleCollection
-    sinit::TSStateBattery
+    sinit::SAR_State
     rewardframes::Frames   = Frames(MIME("image/png"))
     belframes::Frames      = Frames(MIME("image/png"))
     dt::Float64            = 1/10
@@ -18,14 +18,14 @@ function remove_rewards(pomdp, s)
     pomdp.reward[rewardinds(pomdp,s)...] = 0.0
 end
 
-function convertinds(m::TSPOMDPBattery, pos::Vector{Int})
+function convertinds(m::SAR_POMDP, pos::Vector{Int})
     correct_ind = reverse(pos)
     xind = m.size[2]+1 - correct_ind[1]
     inds = [xind, correct_ind[2]]
     return inds
 end
 
-function simulateHIPPO(sim::HIPPOSimulator)
+function simulateSARPOMDP(sim::SARPOMDPSimulator)
     (;msim,max_iter) = sim 
     r_total = 0.0
     s = sim.sinit
@@ -75,7 +75,7 @@ function simulateHIPPO(sim::HIPPOSimulator)
     return history, r_total, iter, sim.rewardframes, sim.belframes
 end
 
-function beliefsim(msolve::TSPOMDPBattery, msim::TSPOMDPBattery, planner, up, b, sinit)
+function beliefsim(msolve::SAR_POMDP, msim::SAR_POMDP, planner, up, b, sinit)
     r_total = 0.0
     s = sinit
     o = Nothing
@@ -83,7 +83,7 @@ function beliefsim(msolve::TSPOMDPBattery, msim::TSPOMDPBattery, planner, up, b,
     max_fps = 10
     dt = 1/max_fps
     d = 1.0
-    sim_states = TSStateBattery[]
+    sim_states = SAR_State[]
     #frames1 = []
     rewardframes = Frames(MIME("image/png"), fps=10)
     belframes = Frames(MIME("image/png"), fps=10)

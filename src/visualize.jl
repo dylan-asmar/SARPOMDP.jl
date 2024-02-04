@@ -1,5 +1,5 @@
 mutable struct GridWorldEnv
-    m::TSPOMDPBattery
+    m::SAR_POMDP
     size::SVector{2, Int}
     rewards::Matrix{Float64}
     robotInit::SVector{2, Int}
@@ -66,7 +66,7 @@ const aarrow = Dict(:up=>'↑', :left=>'←', :down=>'↓', :right=>'→', :stay
 function renderVIPolicy(policy, mdp, s, rewarddist)
     gw = GridWorldEnv(mdp, rewarddist, s.target, size=mdp.size, robotInit=s.robot)
     vi_policy = s -> DiscreteValueIteration.action(policy, s)
-    display(HIPPO.renderMDP(gw, policy = vi_policy))
+    display(SARPOMDP.renderMDP(gw, policy = vi_policy))
 end
 
 function rendhist(hist, m; delay=0.1)
@@ -86,7 +86,7 @@ function rendhist(hist, m, rewarddist; delay=0.1)
     end
 end 
 
-function POMDPTools.ModelTools.render(m::TSPOMDPBattery, goal, 
+function POMDPTools.ModelTools.render(m::SAR_POMDP, goal, 
                                             hippo::Vector{StaticArraysCore.SVector{2, Int64}}, 
                                             baseline::Vector{StaticArraysCore.SVector{2, Int64}})
     nx, ny = m.size

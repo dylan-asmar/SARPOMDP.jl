@@ -24,13 +24,13 @@ using JLD2
 include("common.jl")
 
 include(joinpath(@__DIR__,"batteryPOMDP","core.jl"))
-export TSPOMDPBattery, TSStateBattery
+export SAR_POMDP, SAR_State
 
 include(joinpath(@__DIR__,"batteryPOMDP","functions.jl"))
 include(joinpath(@__DIR__,"batteryPOMDP","observations.jl"))
 include(joinpath(@__DIR__,"batteryPOMDP","simulate.jl"))
-export simulateHIPPO, 
-       HIPPOSimulator
+export simulateSARPOMDP, 
+       SARPOMDPSimulator
 
 include("visualize.jl")
 export rendhist

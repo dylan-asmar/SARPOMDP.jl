@@ -1,10 +1,10 @@
-struct TSStateBattery
+struct SAR_State
     robot::SVector{2, Int}
     target::SVector{2, Int}
     battery::Int
 end
 
-mutable struct TSPOMDPBattery <: POMDP{TSStateBattery, Symbol, BitArray{1}}
+mutable struct SAR_POMDP <: POMDP{SAR_State, Symbol, BitArray{1}}
     size::SVector{2, Int}
     obstacles::Set{SVector{}}
     robot_init::SVector{2, Int}
@@ -15,7 +15,7 @@ mutable struct TSPOMDPBattery <: POMDP{TSStateBattery, Symbol, BitArray{1}}
     maxbatt::Int
 end
 
-function TSPOMDPBattery(sinit::TSStateBattery; 
+function SAR_POMDP(sinit::SAR_State; 
                         roi_points=Dict(), 
                         size=(10,10), 
                         rewarddist=Array{Float64}(undef, 0, 0), 
@@ -28,5 +28,5 @@ function TSPOMDPBattery(sinit::TSStateBattery;
     rois = roi_points
     maxbatt = maxbatt
   
-    TSPOMDPBattery(size, obstacles, robot_init, tprob, targetloc, rois, rewarddist, maxbatt)
+    SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, rois, rewarddist, maxbatt)
 end

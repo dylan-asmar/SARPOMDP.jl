@@ -1,57 +1,58 @@
-function POMDPs.states(m::TSPOMDPBattery) 
-    nonterm = vec(collect(TSStateBattery(SVector(c[1],c[2]), SVector(c[3],c[4]), d) for c in Iterators.product(1:m.size[1], 1:m.size[2], 1:m.size[1], 1:m.size[2]) for d in 1:m.maxbatt))
-    return push!(nonterm, TSStateBattery([-1,-1],[-1,-1],-1))
+function POMDPs.states(m::SAR_POMDP) 
+    nonterm = vec(collect(SAR_State(SVector(c[1],c[2]), SVector(c[3],c[4]), d) for c in Iterators.product(1:m.size[1], 1:m.size[2], 1:m.size[1], 1:m.size[2]) for d in 1:m.maxbatt))
+    return push!(nonterm, SAR_State([-1,-1],[-1,-1],-1))
 end
 
-function POMDPs.stateindex(m::TSPOMDPBattery, s)
+function POMDPs.stateindex(m::SAR_POMDP, s)
     if s.robot == SA[-1,-1]
-        return m.size[1]^2 * m.size[2]^2 + 1
+        return m.size[1]^2 * m.size[2]^2 * m.maxbatt + 1
     else 
         return LinearIndices((1:m.size[1], 1:m.size[2], 1:m.size[1], 1:m.size[2], 1:m.maxbatt))[s.robot..., s.target..., s.battery]
     end
 end
 
-function POMDPs.initialstate(m::TSPOMDPBattery)
-    #return Deterministic(TSStateBattery(m.robot_init,m.targetloc,m.maxbatt))
-    return POMDPTools.Uniform(TSStateBattery(m.robot_init, SVector(x, y), z) for x in 1:m.size[1], y in 1:m.size[2], z in 1:m.maxbatt)
+function POMDPs.initialstate(m::SAR_POMDP)
+    return POMDPTools.Uniform(SAR_State(m.robot_init, SVector(x, y), m.maxbatt) for x in 1:m.size[1], y in 1:m.size[2])
 end
 
 """
     actions
 """
 
-POMDPs.actions(m::TSPOMDPBattery) = (:left, :right, :up, :down, :stay)
+POMDPs.actions(m::SAR_POMDP) = (:left, :right, :up, :down, :stay)
 
-POMDPs.discount(m::TSPOMDPBattery) = 0.95
-
-
-POMDPs.actionindex(m::TSPOMDPBattery, a) = actionind[a]
+POMDPs.discount(m::SAR_POMDP) = 0.95
 
 
-function bounce(m::TSPOMDPBattery, pos, offset)
+POMDPs.actionindex(m::SAR_POMDP, a) = actionind[a]
+
+
+function bounce(m::SAR_POMDP, pos, offset)
     new = clamp.(pos + offset, SVector(1,1), m.size)
 end
 
-function POMDPs.transition(m::TSPOMDPBattery, s, a)
-    states = TSStateBattery[]
+function POMDPs.transition(m::SAR_POMDP, s, a)
+    states = SAR_State[]
     probs = Float64[]
     remaining_prob = 1.0
 
     if isequal(s.robot, s.target)
-        return Deterministic(TSStateBattery([-1,-1], copy(s.target), -1))
+        return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
+    # elseif sp.battery == 1 #Handle empty battery
+    #     return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
     end
 
     newrobot = bounce(m, s.robot, actiondir[a])
 
-    push!(states, TSStateBattery(newrobot, s.target, s.battery-1))
+    push!(states, SAR_State(newrobot, s.target, s.battery-1))
     push!(probs, remaining_prob)
 
     return SparseCat(states, probs)
 
 end
 
-function POMDPs.reward(m::TSPOMDPBattery, s::TSStateBattery, a::Symbol, sp::TSStateBattery)
-    reward_running = -1.0
+function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State)
+    reward_running = 0.0 #-1.0
     reward_target = 0.0
 
     if isequal(sp.robot, sp.target) # if target is found
@@ -63,13 +64,13 @@ function POMDPs.reward(m::TSPOMDPBattery, s::TSStateBattery, a::Symbol, sp::TSSt
     if isterminal(m, sp) # IS THIS NECCESSARY?
         return 0.0
     end
-        
-    return reward_running + reward_target
+    
+    return reward_running + reward_target + m.reward[sp.robot...]
 end
 
 set_default_graphic_size(18cm,14cm)
 
-function POMDPTools.ModelTools.render(m::TSPOMDPBattery, step)
+function POMDPTools.ModelTools.render(m::SAR_POMDP, step)
     #set_default_graphic_size(14cm,14cm)
     nx, ny = m.size
     cells = []
@@ -148,7 +149,7 @@ function rewardinds(m, pos::SVector{2, Int64})
 end
 
 
-function POMDPTools.ModelTools.render(m::TSPOMDPBattery, step, plt_reward::Bool)
+function POMDPTools.ModelTools.render(m::SAR_POMDP, step, plt_reward::Bool)
     nx, ny = m.size
     cells = []
     
@@ -185,12 +186,12 @@ function POMDPTools.ModelTools.render(m::TSPOMDPBattery, step, plt_reward::Bool)
     return compose(context((w-sz)/2, (h-sz)/2, sz, sz), robot, target, grid, outline)
 end
 
-#POMDPs.isterminal(m::TSPOMDPBattery, s::TSStateBattery) = s.robot == SA[-1,-1]
+#POMDPs.isterminal(m::SAR_POMDP, s::SAR_State) = s.robot == SA[-1,-1]
 function dist(curr, start)
     sum(abs.(curr-start))
 end
 
-function POMDPs.isterminal(m::TSPOMDPBattery, s::TSStateBattery)
+function POMDPs.isterminal(m::SAR_POMDP, s::SAR_State)
     required_batt = dist(s.robot, m.robot_init)
     return s.battery - required_batt <= 1 || s.robot == SA[-1,-1] 
 end

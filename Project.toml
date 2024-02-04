@@ -1,4 +1,4 @@
-name = "HIPPO"
+name = "SARPOMDP"
 uuid = "ac105e5d-54bf-46dc-95ab-6052371f57ba"
 authors = ["Zakariya Laouar <zala9003@colorado.edu>"]
 version = "0.1.0"

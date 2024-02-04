@@ -1,5 +1,5 @@
 """
-    observations(m::TSPOMDPBattery)
+    observations(m::SAR_POMDP)
 
 Retrieve observations in TargetSearch observation space
 
@@ -11,10 +11,10 @@ The the observations are ordered as follows:
     5: The target is below the robot
     6: The target is above the robot
 """
-POMDPs.observations(m::TSPOMDPBattery) = OBSERVATIONS #vec(collect(BitVector([c[1],c[2],c[3],c[4],c[5]]) for c in Iterators.product(0:1, 0:1, 0:1, 0:1, 0:1)))
-POMDPs.obsindex(m::TSPOMDPBattery, o::BitVector) = obsind[o]
+POMDPs.observations(m::SAR_POMDP) = OBSERVATIONS #vec(collect(BitVector([c[1],c[2],c[3],c[4],c[5]]) for c in Iterators.product(0:1, 0:1, 0:1, 0:1, 0:1)))
+POMDPs.obsindex(m::SAR_POMDP, o::BitVector) = obsind[o]
 
-function POMDPs.observation(m::TSPOMDPBattery, a::Symbol, sp::TSStateBattery)
+function POMDPs.observation(m::SAR_POMDP, a::Symbol, sp::SAR_State)
     #obs = [BitVector([0,0,0,0,0]), BitVector([1,0,0,0,0]), BitVector([0,1,0,0,0]), BitVector([0,0,1,0,0]), BitVector([0,0,0,1,0]), BitVector([0,0,0,0,1])]
 
     if norm(sp.robot-sp.target) == 1.0 # target and robot within one grid cell of each other 
