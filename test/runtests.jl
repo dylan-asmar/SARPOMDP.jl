@@ -70,6 +70,10 @@ end
         @test reward(pomdp,SAR_State(l,target,99),:stay,SAR_State(l,target,99)) == vals[i]
     end
     @test reward(pomdp,SAR_State(target,target,99),:stay,SAR_State(target,target,99)) == pomdp.r_find
+    term_plus_one = 8
+    @test isterminal(pomdp,SAR_State(target,target,term_plus_one)) == false
+    @test isterminal(pomdp,SAR_State(target,target,term_plus_one-1)) == true
+    @test reward(pomdp,SAR_State(target,target,term_plus_one),:stay,SAR_State(target,target,term_plus_one)) == pomdp.r_find
 end
 
 @testset "Consistency Tests" begin

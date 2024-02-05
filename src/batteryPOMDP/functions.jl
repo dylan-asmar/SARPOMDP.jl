@@ -55,17 +55,17 @@ function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State)
     reward_running = 0.0 #-1.0
     reward_target = 0.0
 
-    if isequal(sp.robot, sp.target) # if target is found
+    if isterminal(m, s) # IS THIS NECCESSARY?
+        return 0.0
+    end
+
+    if isequal(s.robot, s.target) # if target is found
         reward_running = 0.0
         reward_target = m.r_find
         return reward_running + reward_target
     end
-
-    if isterminal(m, sp) # IS THIS NECCESSARY?
-        return 0.0
-    end
     
-    return reward_running + reward_target + m.reward[sp.robot...]
+    return reward_running + reward_target + m.reward[s.robot...]
 end
 
 set_default_graphic_size(18cm,14cm)
