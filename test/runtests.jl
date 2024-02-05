@@ -69,12 +69,12 @@ end
     for (i,l) in enumerate(locs)
         @test reward(pomdp,SAR_State(l,target,99),:stay,SAR_State(l,target,99)) == vals[i]
     end
-    @test reward(pomdp,SAR_State(target,target,99),:stay,SAR_State(target,target,99)) == 1000
+    @test reward(pomdp,SAR_State(target,target,99),:stay,SAR_State(target,target,99)) == pomdp.r_find
 end
 
-# @testset "Consistency Tests" begin
-#     @test has_consistent_distributions(pomdp)
-# end
+@testset "Consistency Tests" begin
+    @test has_consistent_distributions(pomdp)
+end
 
 # rewarddist = [3.0 3.0;
 #               3.0 3.0]
