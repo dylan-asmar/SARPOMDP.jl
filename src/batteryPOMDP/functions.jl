@@ -51,7 +51,9 @@ function POMDPs.transition(m::SAR_POMDP, s, a)
 
 end
 
-function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State)
+POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State) = reward(m, s, a)
+
+function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol)
     reward_running = 0.0 #-1.0
     reward_target = 0.0
 
