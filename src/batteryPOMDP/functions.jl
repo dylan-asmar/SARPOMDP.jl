@@ -21,7 +21,7 @@ end
 
 POMDPs.actions(m::SAR_POMDP) = (:left, :right, :up, :down, :stay)
 
-POMDPs.discount(m::SAR_POMDP) = 0.95
+POMDPs.discount(m::SAR_POMDP) = 1.0
 
 
 POMDPs.actionindex(m::SAR_POMDP, a) = actionind[a]
