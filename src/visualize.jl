@@ -141,7 +141,7 @@ function POMDPTools.ModelTools.render(m::SAR_POMDP, goal,
     robot_ctx = cell_ctx(hippo[end], m.size)
     robot = compose(robot_ctx, circle(0.5, 0.5, 0.5), fill("black"))
     target_ctx = cell_ctx(goal, m.size)
-    target = compose(target_ctx, star(0.5,0.5,1.0,5,0.5), fill("orange"), stroke("black"))
+    target = compose(target_ctx, star(0.5,0.5,0.5,5,0.5), fill("orange"), stroke("black"))
 
     #mapcells_hippo = [coord(cell, m.size) for cell ∈ hippo]
     #mapcells_base = [coord(cell, m.size) for cell ∈ baseline]
