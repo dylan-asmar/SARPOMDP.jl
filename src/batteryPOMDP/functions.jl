@@ -19,7 +19,7 @@ end
     actions
 """
 
-POMDPs.actions(m::SAR_POMDP) = (:left, :right, :up, :down, :stay)
+POMDPs.actions(m::SAR_POMDP) = (:left, :right, :up, :down) #, :stay)
 
 POMDPs.discount(m::SAR_POMDP) = 1.0
 
@@ -51,7 +51,9 @@ function POMDPs.transition(m::SAR_POMDP, s, a)
 
 end
 
-function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State)
+POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State) = reward(m, s, a)
+
+function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol)
     reward_running = 0.0 #-1.0
     reward_target = 0.0
 
@@ -64,7 +66,7 @@ function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State)
         reward_target = m.r_find
         return reward_running + reward_target
     end
-    
+
     return reward_running + reward_target + m.reward[s.robot...]
 end
 
