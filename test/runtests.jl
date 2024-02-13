@@ -72,7 +72,8 @@ end
     @test reward(pomdp,SAR_State(target,target,99),:stay,SAR_State(target,target,99)) == pomdp.r_find
     term_plus_one = 8
     @test isterminal(pomdp,SAR_State(target,target,term_plus_one)) == false
-    @test isterminal(pomdp,SAR_State(target,target,term_plus_one-1)) == true
+    @test isterminal(pomdp,SAR_State([-1,-1],[-1,-1],-1)) == true
+    @test isterminal(pomdp,support(transition(pomdp,SAR_State(target,target,term_plus_one-1),:up))[1]) == true
     @test reward(pomdp,SAR_State(target,target,term_plus_one),:stay,SAR_State(target,target,term_plus_one)) == pomdp.r_find
 end
 

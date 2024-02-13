@@ -36,7 +36,9 @@ function POMDPs.transition(m::SAR_POMDP, s, a)
     probs = Float64[]
     remaining_prob = 1.0
 
-    if isequal(s.robot, s.target)
+    required_batt = dist(s.robot, m.robot_init)
+
+    if isequal(s.robot, s.target) || (s.battery - required_batt <= 1)
         return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
     # elseif sp.battery == 1 #Handle empty battery
     #     return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
@@ -194,6 +196,5 @@ function dist(curr, start)
 end
 
 function POMDPs.isterminal(m::SAR_POMDP, s::SAR_State)
-    required_batt = dist(s.robot, m.robot_init)
-    return s.battery - required_batt <= 1 || s.robot == SA[-1,-1] 
+    return s.robot == SA[-1,-1] || s.target == SA[-1,-1] || s.battery == -1
 end
