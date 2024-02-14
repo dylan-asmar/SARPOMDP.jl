@@ -161,7 +161,7 @@ function POMDPTools.ModelTools.render(m::SAR_POMDP, step, plt_reward::Bool)
     maxr = maximum(m.reward)
     for x in 1:nx, y in 1:ny
         cell = cell_ctx((x,y), m.size)
-        r = m.reward[rewardinds(m, SA[x,y])...]
+        r = m.reward[rewardinds(m, SA[x,1+ny-y])...]
         if iszero(r)
             target = compose(context(), rectangle(), fill("black"), stroke("gray"))
         else
@@ -180,7 +180,7 @@ function POMDPTools.ModelTools.render(m::SAR_POMDP, step, plt_reward::Bool)
         robot_ctx = cell_ctx(step[:sp].robot, m.size)
         robot = compose(robot_ctx, circle(0.5, 0.5, 0.5), fill("blue"))
         target_ctx = cell_ctx(step[:sp].target, m.size)
-        target = compose(target_ctx, star(0.5,0.5,1.0,5,0.5), fill("orange"), stroke("black"))
+        target = compose(target_ctx, star(0.5,0.5,0.75,5,0.5), fill("orange"), stroke("black"))
     else
         robot = nothing
         target = nothing

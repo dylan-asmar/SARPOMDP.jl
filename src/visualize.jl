@@ -99,7 +99,7 @@ function POMDPTools.ModelTools.render(m::SAR_POMDP, goal,
     opbase = Dict(baseline.=>opvecbase)
     for x in 1:nx, y in 1:ny
         cell = cell_ctx((x,y), m.size)
-        r = m.reward[rewardinds(m, SA[x,y])...]
+        r = m.reward[rewardinds(m, SA[x,1+ny-y])...]
         if iszero(r)
             target = compose(context(), rectangle(), fill("black"), stroke("gray"))
         else
