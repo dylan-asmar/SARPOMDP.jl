@@ -180,7 +180,7 @@ function POMDPTools.ModelTools.render(m::SAR_POMDP, step, plt_reward::Bool)
         robot_ctx = cell_ctx(step[:sp].robot, m.size)
         robot = compose(robot_ctx, circle(0.5, 0.5, 0.5), fill("blue"))
         target_ctx = cell_ctx(step[:sp].target, m.size)
-        target = compose(target_ctx, star(0.5,0.5,0.75,5,0.5), fill("orange"), stroke("black"))
+        target = compose(target_ctx, star(0.5,0.5,0.5,5,0.5), fill("orange"), stroke("black"))
     else
         robot = nothing
         target = nothing
