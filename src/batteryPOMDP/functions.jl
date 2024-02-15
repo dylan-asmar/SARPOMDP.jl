@@ -149,19 +149,19 @@ function rewardinds(m, pos::SVector{2, Int64})
     xind = m.size[2]+1 - correct_ind[1]
     inds = [xind, correct_ind[2]]
 
-    return inds
+    return pos
 end
 
 
 function POMDPTools.ModelTools.render(m::SAR_POMDP, step, plt_reward::Bool)
     nx, ny = m.size
     cells = []
-    
+
     minr = minimum(m.reward)-1
     maxr = maximum(m.reward)
     for x in 1:nx, y in 1:ny
         cell = cell_ctx((x,y), m.size)
-        r = m.reward[rewardinds(m, SA[x,1+ny-y])...]
+        r = m.reward[rewardinds(m, SA[x,y])...]
         if iszero(r)
             target = compose(context(), rectangle(), fill("black"), stroke("gray"))
         else
