@@ -66,7 +66,7 @@ function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol)
     if isequal(s.robot, s.target) # if target is found
         reward_running = 0.0
         reward_target = m.r_find
-        return reward_running + reward_target
+        return reward_running + reward_target +  m.reward[s.robot...]
     end
 
     return reward_running + reward_target + m.reward[s.robot...]
