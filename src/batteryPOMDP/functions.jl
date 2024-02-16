@@ -159,26 +159,70 @@ function POMDPTools.ModelTools.render(m::SAR_POMDP, step, plt_reward::Bool)
 
     minr = minimum(m.reward)-1
     maxr = maximum(m.reward)
+
+    if haskey(step, :hist)
+        trajec = [(histstep[1].robot, histstep[2]) for histstep in step[:hist]]
+        statehist = [s for (s,a) in trajec]
+        actionhist = [a for (s,a) in trajec]
+    end
     for x in 1:nx, y in 1:ny
         cell = cell_ctx((x,y), m.size)
         r = m.reward[rewardinds(m, SA[x,y])...]
         if iszero(r)
-            target = compose(context(), rectangle(), fill("black"), stroke("gray"))
+            target = compose(context(), rectangle(), fill("white"), stroke("gray"))
         else
             frac = (r-minr)/(maxr-minr)
             clr = get(ColorSchemes.turbo, frac)
-            target = compose(context(), rectangle(), fill(clr), stroke("gray"), fillopacity(0.5))
+            target = compose(context(), rectangle(), fill(clr), stroke("gray"), fillopacity(0.9))
+        end
+
+        if haskey(step, :hist)
+            for (i, (xh, yh)) in enumerate(statehist)
+                if x == xh && y == yh
+                    if actionhist[i] == :left
+                        spec = compose(context(), arrow(), stroke("black"), fill(nothing), linewidth(0.6mm), (context(), line([(0.5,0.5),(0.3,0.5)]), stroke("black")))
+                        compose!(target, spec)
+                    elseif actionhist[i] == :right
+                        spec = compose(context(), arrow(), stroke("black"), fill(nothing), linewidth(0.6mm), (context(), line([(0.5,0.5),(0.7,0.5)]), stroke("black")))
+                        compose!(target, spec)
+                    elseif actionhist[i] == :up
+                        spec = compose(context(), arrow(), stroke("black"), fill(nothing), linewidth(0.6mm), (context(), line([(0.5,0.5),(0.5,0.3)]), stroke("black")))
+                        compose!(target, spec)
+                    elseif actionhist[i] == :down
+                        spec = compose(context(), arrow(), stroke("black"), fill(nothing), linewidth(0.6mm), (context(), line([(0.5,0.5),(0.5,0.7)]), stroke("black")))
+                        compose!(target, spec)
+                    end
+                end
+            end
+
+            # if SA[x,y] in statehist
+            #     if trajec == :left
+            #         spec = compose(context(), line([(0.5,0.5),(0.1,0.5)]), stroke("black"))
+            #         compose!(target, spec)
+            #     elseif step[:a] == :right
+            #         spec = compose(context(), line([(0.5,0.5),(0.9,0.5)]), stroke("black"))
+            #         compose!(target, spec)
+            #     elseif step[:a] == :up
+            #         spec = compose(context(), line([(0.5,0.5),(0.5,0.9)]), stroke("black"))
+            #         compose!(target, spec)
+            #     elseif step[:a] == :down
+            #         spec = compose(context(), line([(0.5,0.5),(0.5,0.1)]), stroke("black"))
+            #         compose!(target, spec)
+            #     end
+            # #   spec = compose(context(), circle(0.5, 0.5, 0.1), fill("blue"), stroke("black"))
+            # #   compose!(target, spec)
+            # end
         end
 
         compose!(cell, target)
         push!(cells, cell)
     end
-    grid = compose(context(), linewidth(0.00000001mm), cells...)
-    outline = compose(context(), linewidth(0.01mm), rectangle(), fill("white"), stroke("black"))
+    grid = compose(context(), linewidth(1mm), cells...)
+    outline = compose(context(), linewidth(0.05mm), rectangle(), fill("black"), stroke("black"))
 
     if haskey(step, :sp)
         robot_ctx = cell_ctx(step[:sp].robot, m.size)
-        robot = compose(robot_ctx, circle(0.5, 0.5, 0.5), fill("blue"))
+        robot = compose(robot_ctx, circle(0.5, 0.5, 0.3), fill("blue"))
         target_ctx = cell_ctx(step[:sp].target, m.size)
         target = compose(target_ctx, star(0.5,0.5,0.5,5,0.5), fill("orange"), stroke("black"))
     else
