@@ -37,14 +37,19 @@ function POMDPs.transition(m::SAR_POMDP, s, a)
     remaining_prob = 1.0
 
     required_batt = dist(s.robot, m.robot_init)
+    newrobot = bounce(m, s.robot, actiondir[a])
 
-    if isequal(s.robot, s.target) || (s.battery - required_batt <= 1)
+    if m.terminate_on_find && isequal(s.robot, s.target)
         return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
+    elseif m.auto_home && (s.battery - required_batt <= 1)
+        return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
+    elseif !m.terminate_on_find && !m.auto_home
+        if s != m.robot_init && newrobot == m.robot_init #THIS IS NOT STOCHASTIC SAFE...
+            return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
+        end
     # elseif sp.battery == 1 #Handle empty battery
     #     return Deterministic(SAR_State([-1,-1], [-1,-1], -1))
     end
-
-    newrobot = bounce(m, s.robot, actiondir[a])
 
     push!(states, SAR_State(newrobot, s.target, s.battery-1))
     push!(probs, remaining_prob)
@@ -58,6 +63,11 @@ POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol, sp::SAR_State) = reward(m, 
 function POMDPs.reward(m::SAR_POMDP, s::SAR_State, a::Symbol)
     reward_running = 0.0 #-1.0
     reward_target = 0.0
+    
+    required_batt = dist(s.robot, m.robot_init)
+    if !m.auto_home && (s.battery - required_batt <= 1) && s != m.robot_init
+        return -1e10
+    end
 
     if isterminal(m, s) # IS THIS NECCESSARY?
         return 0.0
