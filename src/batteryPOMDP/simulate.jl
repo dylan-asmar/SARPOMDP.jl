@@ -1,8 +1,8 @@
 Base.@kwdef mutable struct SARPOMDPSimulator 
     msim::SAR_POMDP
-    planner::POMCPPlanner
-    up::BasicParticleFilter
-    b::ParticleCollection
+    planner::Policy
+    up::DiscreteUpdater
+    b::DiscreteBelief
     sinit::SAR_State
     rewardframes::Frames   = Frames(MIME("image/png"))
     belframes::Frames      = Frames(MIME("image/png"))
