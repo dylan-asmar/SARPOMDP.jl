@@ -66,15 +66,46 @@ pomdp = SAR_POMDP(sinit,
 end
 
 @testset "Reward" begin
+    term_plus_one = 8
     for (i,l) in enumerate(locs)
         @test reward(pomdp,SAR_State(l,target,99),:stay,SAR_State(l,target,99)) == vals[i]
     end
     @test reward(pomdp,SAR_State(target,target,99),:stay,SAR_State(target,target,99)) == pomdp.r_find
-    term_plus_one = 8
-    @test isterminal(pomdp,SAR_State(target,target,term_plus_one)) == false
-    @test isterminal(pomdp,SAR_State([-1,-1],[-1,-1],-1)) == true
-    @test isterminal(pomdp,support(transition(pomdp,SAR_State(target,target,term_plus_one-1),:up))[1]) == true
     @test reward(pomdp,SAR_State(target,target,term_plus_one),:stay,SAR_State(target,target,term_plus_one)) == pomdp.r_find
+end
+
+@testset "Terminal" begin
+    term_plus_one = 8
+    @test isterminal(pomdp,SAR_State([-1,-1],[-1,-1],-1)) == true
+    @test isterminal(pomdp,SAR_State(target,target,term_plus_one)) == false
+    if pomdp.terminate_on_find == true
+        @test isterminal(pomdp,support(transition(pomdp,SAR_State(target,target,term_plus_one-1),:up))[1]) == true
+        @test isterminal(pomdp,support(transition(pomdp,SAR_State(target,target,term_plus_one),:up))[1]) == true
+    end
+    if pomdp.auto_home == true
+        @show support(transition(pomdp,SAR_State(target+SVector{2}([1,0]),target,term_plus_one-1),:up))[1]
+        @test isterminal(pomdp,support(transition(pomdp,SAR_State(target+SVector{2}([1,0]),target,term_plus_one-1),:up))[1]) == true
+    end
+end
+
+@testset "No Autohome and No Terminate on Find" begin
+    term_plus_one = 8
+    rewarddist2 = abs.(rewarddist)
+    mapsize2 = reverse(size(rewarddist2)) #(13,16)
+    maxbatt2 = Int(norm(mapsize2,1)*2)
+    target2 = [4,4]
+    sinit2 = SAR_State([1,1], target2, maxbatt2)#rand(initialstate(msim))
+    pomdp2 = SAR_POMDP(sinit2, 
+                    size=mapsize2, 
+                    rewarddist=rewarddist2, 
+                    maxbatt=maxbatt2,auto_home=false,terminate_on_find=false)
+    if pomdp2.terminate_on_find == false && pomdp2.auto_home == false
+        @test isterminal(pomdp2,support(transition(pomdp2,SAR_State(target2,target2,term_plus_one-1),:up))[1]) == false
+        @test isterminal(pomdp2,support(transition(pomdp2,SAR_State(pomdp2.robot_init+SVector{2}([1,1]),target2,term_plus_one-1),:up))[1]) == false
+        @test isterminal(pomdp2,support(transition(pomdp2,SAR_State(pomdp2.robot_init+SVector{2}([1,0]),target2,term_plus_one-1),:left))[1]) == true
+        @test isterminal(pomdp2,support(transition(pomdp2,SAR_State(pomdp2.robot_init+SVector{2}([0,1]),target2,term_plus_one-1),:down))[1]) == true
+    end
+    @test reward(pomdp2,SAR_State(target,target,term_plus_one-1),:stay) == -1e10
 end
 
 @testset "Consistency Tests" begin

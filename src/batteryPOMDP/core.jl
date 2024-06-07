@@ -15,13 +15,15 @@ mutable struct SAR_POMDP <: POMDP{SAR_State, Symbol, BitArray{1}}
     r_find::Float64
     reward::Matrix{Float64}
     maxbatt::Int
+    auto_home::Bool
+    terminate_on_find::Bool
 end
 
 function SAR_POMDP(sinit::SAR_State; 
                         roi_points=Dict{SVector{2,Int64},Float64}(), 
                         size=(10,10), 
                         rewarddist=Array{Float64}(undef, 0, 0), 
-                        maxbatt=100)
+                        maxbatt=100,auto_home=true,terminate_on_find=true)
 
     obstacles = Set{SVector{2, Int}}()
     robot_init = sinit.robot
@@ -31,7 +33,7 @@ function SAR_POMDP(sinit::SAR_State;
     r_vals = values(roi_points)
     maxbatt = maxbatt
   
-    return SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, SVector{2,Int64}[r_locs...], Float64[r_vals...], 1000.0, rewarddist, maxbatt)
+    return SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, SVector{2,Int64}[r_locs...], Float64[r_vals...], 1000.0, rewarddist, maxbatt, auto_home, terminate_on_find)
 end
 
 function SAR_POMDP(;
@@ -41,7 +43,7 @@ function SAR_POMDP(;
     rew_locs = SVector{3}([[1,4],[4,1],[3,3]]),
     rew_vals = SVector{3}([2.0,2.0,1.0]),
     r_find = 1000.0,
-    size=(5,5))
+    size=(5,5),auto_home=true,terminate_on_find=true)
 
 
     rewarddist = zeros(size)
@@ -56,5 +58,5 @@ function SAR_POMDP(;
     targetloc = sinit.target
     maxbatt = maxbatt
 
-    return SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, rew_locs, rew_vals, r_find, rewarddist, maxbatt)
+    return SAR_POMDP(size, obstacles, robot_init, tprob, targetloc, rew_locs, rew_vals, r_find, rewarddist, maxbatt, auto_home, terminate_on_find)
 end
